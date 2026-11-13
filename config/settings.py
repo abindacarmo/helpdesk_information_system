@@ -46,6 +46,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "apps.accounts",
+    "apps.tickets",
+    "apps.reports",
 ]
 
 MIDDLEWARE = [
@@ -76,6 +79,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+
+# Custom user model. Must be set before the first migration.
+AUTH_USER_MODEL = "accounts.User"
+
+# Authentication redirects.
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "dashboard"
+LOGOUT_REDIRECT_URL = "login"
 
 
 # Database

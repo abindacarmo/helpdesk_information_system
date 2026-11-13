@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Login — Helpdesk{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h1 class="h5 mb-3">Sign in</h1>
+        {% if form.errors %}
+          <div class="alert alert-danger">Wrong username or password.</div>
+        {% endif %}
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label" for="id_username">Username</label>
+            <input type="text" class="form-control" id="id_username" name="username"
+                   value="{{ form.username.value|default:'' }}" required autofocus>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="id_password">Password</label>
+            <input type="password" class="form-control" id="id_password" name="password" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Log in</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
