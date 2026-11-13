@@ -35,7 +35,7 @@ A web-based IT Helpdesk Ticketing System for a university final project:
 - Tech stack: Python, Django (server-rendered templates), SQLite,
   Bootstrap 5 (local, offline), package manager `uv`, django-environ,
   Pillow.
-- Business logic belongs in `tickets/services.py`; views stay thin.
+- Business logic belongs in `apps/tickets/services.py`; views stay thin.
 - Permissions are enforced server-side in every view (role decorator),
   never by hiding UI elements only.
 - Anonymous or unauthorized access to another user's ticket returns 404.

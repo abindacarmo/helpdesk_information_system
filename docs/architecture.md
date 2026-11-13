@@ -36,20 +36,19 @@ server and SQLite, opened in a desktop browser.
 ```
 helpdesk_information_system/
 ├── config/            # Django project: settings, root urls, wsgi/asgi
-├── accounts/          # custom User model, login/logout, role checks
-├── tickets/           # Ticket, comments, history, notifications
-│   ├── models.py
-│   ├── services.py    # business rules (transitions, SLA, notifications)
-│   ├── views.py
-│   ├── forms.py
-│   ├── urls.py
-│   ├── tests/
-│   └── management/commands/seed_demo.py
-├── reports/           # admin dashboard and report views
+├── apps/              # all project apps live in one package
+│   ├── accounts/      # custom User model, login/logout, role checks
+│   ├── tickets/       # Ticket, comments, history, notifications
+│   │   ├── models.py
+│   │   ├── services.py    # business rules (transitions, SLA, notifications)
+│   │   ├── views.py
+│   │   ├── urls.py
+│   │   └── ...
+│   └── reports/       # admin dashboard and report views
 ├── templates/         # base.html + app template folders
 ├── static/            # local Bootstrap CSS/JS, app.css
 ├── media/             # uploaded ticket images (git-ignored)
-├── docs/              # PROJECT_SPEC.pdf, TEST_LOG.md
+├── docs/              # PROJECT_SPEC.pdf, architecture.md, TEST_LOG.md
 └── manage.py
 ```
 
@@ -57,6 +56,10 @@ helpdesk_information_system/
 
 - `accounts`, `tickets`, and `reports` are separate apps so each
   responsibility (identity, ticket domain, reporting) has a clear home.
+  They are grouped under one `apps/` package (an owner decision, slightly
+  deviating from the spec's Section 11.1 root layout); each app config uses
+  `name = "apps.<app>"` with a stable `label` (`accounts`, `tickets`,
+  `reports`), so model and URL references stay as in the spec.
 - `config` only contains project wiring (settings, root URLconf).
 - Templates and static files live at project level so Bootstrap is served
   locally (the system must work offline).
@@ -65,9 +68,9 @@ helpdesk_information_system/
 
 | App         | Responsibility                                                            |
 | ----------- | ------------------------------------------------------------------------- |
-| `accounts`  | Custom user model (`User` with `role`), authentication views, shared role-check decorators used by other apps |
-| `tickets`   | Ticket CRUD, assignment, status transitions, comments, status history, notifications, SLA logic, seed command |
-| `reports`   | Admin dashboard (status counts, overdue, unassigned) and reports (resolution time, per category, per technician) |
+| `apps.accounts` | Custom user model (`User` with `role`), authentication views, shared role-check decorators used by other apps |
+| `apps.tickets`  | Ticket CRUD, assignment, status transitions, comments, status history, notifications, SLA logic, seed command |
+| `apps.reports`  | Admin dashboard (status counts, overdue, unassigned) and reports (resolution time, per category, per technician) |
 | `config`    | Settings, root URL routing, WSGI/ASGI entry points                          |
 
 ## 4. Layering and the service layer
@@ -84,7 +87,7 @@ Service   (all business logic: transitions, SLA, history, notifications)
 Model     (data persistence via the Django ORM only)
 ```
 
-`tickets/services.py` is the single home for business rules:
+`apps/tickets/services.py` is the single home for business rules:
 
 - Ticket creation (code generation, `due_at` calculation, initial history row)
 - Assignment and reassignment (including the IN_PROGRESS → ASSIGNED fallback)
@@ -133,7 +136,7 @@ Key design decisions:
 Example: Admin assigns a ticket (`POST /tickets/<code>/assign/`).
 
 ```
-1.  config/urls.py → tickets/urls.py matches the route
+1.  config/urls.py → apps/tickets/urls.py matches the route
 2.  View: login required, role checked (Admin only) → otherwise 403/redirect
 3.  View: loads Ticket with select_related; object-level access check → 404
 4.  Form validates the chosen technician
@@ -154,7 +157,7 @@ form.
 
 - Authentication is required on every page except `/login/`.
 - Role checks are enforced server-side at the start of every view using one
-  shared decorator/mixin in `accounts` — hiding buttons in templates is not
+  shared decorator/mixin in `apps.accounts` — hiding buttons in templates is not
   security.
 - Object-level scoping: a Reporter may only open tickets they created, a
   Technician only tickets assigned to them; unauthorized object access
