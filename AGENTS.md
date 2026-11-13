@@ -34,12 +34,14 @@ SLA due dates, and overdue markers.
 
 ## Coding Rules
 
-- Business logic lives in `tickets/services.py` (transitions, SLA, history,
-  notifications). Views stay thin; templates contain no business rules.
+- Business logic lives in `apps/tickets/services.py` (transitions, SLA,
+  history, notifications). Views stay thin; templates contain no business
+  rules.
 - Function-based views preferred. Check permissions at the start of every
   view (server-side, via a shared role-check decorator/mixin).
-- Custom user model `accounts.User` (extends `AbstractUser`, adds `role`)
-  must exist before the first migration. `AUTH_USER_MODEL` is set first.
+- Custom user model `accounts.User` in `apps/accounts/` (extends
+  `AbstractUser`, adds `role`) must exist before the first migration.
+  `AUTH_USER_MODEL` is set first.
 - Follow PEP 8. Use `select_related`/`prefetch_related` on list pages.
 - All state-changing actions use POST with `{% csrf_token %}`.
 - No secrets in Git. `db.sqlite3`, `media/`, and `.env` stay git-ignored.
