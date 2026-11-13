@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — Helpdesk{% endblock %}
+
+{% block content %}
+<h1 class="h4 mb-3">
+  {% if user.role == "ADMIN" %}Admin Dashboard
+  {% elif user.role == "TECHNICIAN" %}Technician Dashboard
+  {% else %}My Tickets
+  {% endif %}
+</h1>
+<p class="text-muted">Dashboard content will be built in later milestones.</p>
+{% endblock %}
